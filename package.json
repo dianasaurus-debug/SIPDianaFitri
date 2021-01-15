@@ -21,7 +21,16 @@
         "sass": "^1.20.1",
         "sass-loader": "^8.0.0",
         "vue": "^2.5.17",
-        "vue-loader": "^15.9.5",
+        "vue-loader": "^15.9.6",
         "vue-template-compiler": "^2.6.10"
+    },
+    "dependencies": {
+        "@fortawesome/fontawesome-free": "^5.15.1",
+        "admin-lte": "^3.1.0-rc",
+        "laravel-vue-pagination": "^2.3.1",
+        "sweetalert2": "^10.12.7",
+        "vform": "^1.0.1",
+        "vue-progressbar": "^0.7.5",
+        "vue-router": "^3.4.9"
     }
 }

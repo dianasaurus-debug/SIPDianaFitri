@@ -26,6 +26,9 @@ Route::group(['middleware' => ['web', 'auth', 'roles']],function(){
     });
 
     Route::group(['roles'=>'admin'],function(){
+        Route::get('/admin/{path}', 'App\Http\Controllers\AdminController@index')->where('path', '[A-Za-z]+');
         Route::resource('admin', App\Http\Controllers\AdminController::class);
+        Route::resource('users', App\Http\Controllers\UserManagementController::class);
+        Route::resource('roles', App\Http\Controllers\RoleController::class);
     });
 });
