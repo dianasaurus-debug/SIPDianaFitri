@@ -15,7 +15,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'User Management') }}</title>
+    <title>{{ config('app.name', 'Admin K-CKET') }}</title>
 
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}" defer></script>
@@ -89,7 +89,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-cog green"></i>
                             <p>
-                                Manajemen
+                                Manajemen User
                                 <i class="right fas fa-angle-left"></i>
                             </p>
                         </a>
@@ -97,7 +97,32 @@ scratch. This page gets rid of all links and provides the needed markup only.
                             <li class="nav-item">
                                 <router-link to="/admin/users" class="nav-link  sub-management">
                                     <i class="nav-icon fas fa-user-friends"></i>
-                                    <p>Users</p>
+                                    <p>Data Users</p>
+                                </router-link>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item menu-open">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-ticket-alt green"></i>
+                            <p>
+                                Manajemen Konser
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <router-link to="/admin/concerts" class="nav-link  sub-management">
+                                    <i class="nav-icon fas fa-building"></i>
+                                    <p>Data Konser</p>
+                                </router-link>
+                            </li>
+                        </ul>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <router-link to="/admin/categories" class="nav-link  sub-management">
+                                    <i class="nav-icon fas fa-guitar"></i>
+                                    <p>Kategori Tiket</p>
                                 </router-link>
                             </li>
                         </ul>

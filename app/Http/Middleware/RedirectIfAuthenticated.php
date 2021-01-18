@@ -38,7 +38,7 @@ class RedirectIfAuthenticated
                     return redirect('/admin/dashboard');
                     break;
                 case 2:
-                    return redirect('/user');
+                    return redirect('/user/concerts');
                     break;
 
                 default:
