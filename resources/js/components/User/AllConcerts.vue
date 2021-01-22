@@ -6,6 +6,23 @@
                 <div class="text-center mt-5">
                     <pulse-loader :loading="loading && openModal == false"></pulse-loader>
                 </div>
+                <div class="align-items-center p-2">
+                    <select v-model="selected.idol_id">
+                        <option value="all" selected>All Category</option>
+                        <option v-for="category in categories" v-bind:value="category.id">{{ category.nama_idol }}</option>
+                    </select>
+                    <select v-model="selected.tanggal">
+                        <option value="all">All Dates</option>
+                        <option value="tm">This Month</option>
+                        <option value="nm">Next Month</option>
+                        <option value="ty">This Year</option>
+                        <option value="tw">This Week</option>
+                    </select>
+                    <select v-model="selected.price_ranges">
+                        <option :value="[]" selected>All Prices</option>
+                        <option v-for="price in prices_list" v-bind:value="price">{{ price[0]}} - {{ price[1]}}</option>
+                    </select>
+                </div>
             </div>
         </div>
         <div class="row" v-show="loading == false ">
@@ -127,10 +144,31 @@ export default {
             openModal : false,
             ticket : {},
             concert : {},
+            categories : {},
             createTicket : {
                 jumlah_seat : '',
                 concert_id : '',
-            }
+            },
+            prices_list : [
+                [1000000, 1500000],
+                [1500000, 2000000],
+                [2000000, 2500000],
+                [2500000, 3000000],
+                [3000000, 7000000],
+            ],
+            selected: {
+                idol_id : 'all',
+                tanggal: 'all',
+                price_ranges : [],
+            },
+        }
+    },
+    watch: {
+        selected: {
+            handler: function () {
+                this.getConcerts();
+            },
+            deep: true
         }
     },
     methods: {
@@ -173,7 +211,6 @@ export default {
             this.loading = true;
             axios.get('/concerts/view/'+id).then( concert => {
                 this.concert = concert.data;
-                this.failed = false;
             }). catch((error) => {
                 this.failed = true;
             }). finally(()=> {
@@ -182,17 +219,26 @@ export default {
         },
         getConcerts() {
             this.loading = true;
-            axios.get('/concerts/all').then(concerts => {
-                this.concerts = concerts.data.data;
+            axios.get('/concerts/all', {
+                params : this.selected
+            }).then(concerts => {
+                this.concerts = concerts.data;
                 this.failed = false;
             }).catch((error) => {
                 this.failed = true;
             }).finally(() => {
                 this.loading = false;
             });
-        }
+        },
+        getIdols(){
+            axios.get('/idols/all').then(categories=> {
+                this.categories = categories.data;
+            })
+
+        },
     },
     created() {
+        this.getIdols();
         this.getConcerts();
     },
 

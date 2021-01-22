@@ -24,7 +24,8 @@ class ConcertResource extends JsonResource
             'idol_id' => $this->idol_id,
             'jumlah_seat' => $this->jumlah_seat,
             'idol' => $this->category->nama_idol,
-            'price' => $this->price
+            'price' => $this->price,
+            'gambar_path' => 'localhost:8000/images/concerts/'.$this->gambar,
         ];
     }
 }

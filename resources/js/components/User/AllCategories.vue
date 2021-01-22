@@ -209,7 +209,7 @@ export default {
         getCategories(){
             this.loading = true;
             axios.get('/idols/all').then( categories => {
-                this.categories = categories.data.data;
+                this.categories = categories.data;
                 this.failed = false;
             }). catch((error) => {
                 this.failed = true;

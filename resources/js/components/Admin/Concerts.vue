@@ -9,6 +9,25 @@
                         <button type="button" class="btn btn-danger" v-show="deleteItems.length > 0" @click="deleteMultipleCategories">
                             Delete Selected
                         </button>
+                        <select v-model="selected.idol_id">
+                            <option value="all" selected>All Category</option>
+                            <option v-for="category in categories" v-bind:value="category.id">{{ category.nama_idol }}</option>
+                        </select>
+                        <select v-model="selected.tanggal">
+                            <option value="all">All Dates</option>
+                            <option value="tm">This Month</option>
+                            <option value="nm">Next Month</option>
+                            <option value="ty">This Year</option>
+                            <option value="tw">This Week</option>
+                        </select>
+                        <select v-model="selected.price_ranges">
+                            <option :value="[]" selected>All Prices</option>
+                            <option v-for="price in prices_list" v-bind:value="price">{{ price[0]}} - {{ price[1]}}</option>
+                        </select>
+                        <a v-show="this.selected.price_ranges.length >0" :href="'/concerts/export/excel?idol_id='+this.selected.idol_id+'&tanggal='+this.selected.tanggal+'&price_ranges[]='+this.selected.price_ranges[0]+'&price_ranges[]='+this.selected.price_ranges[1]"
+                           class="btn btn-primary">Export Excel</a>
+                        <a v-show="this.selected.price_ranges.length==0" :href="'/concerts/export/excel?idol_id='+this.selected.idol_id+'&tanggal='+this.selected.tanggal"
+                           class="btn btn-primary">Export Excel</a>
                         <button type="button" class="btn btn-success" @click="newModal">
                             Tambah <i class="fas fa-user-plus"></i>
                         </button>
@@ -29,6 +48,7 @@
                             <th>Tanggal</th>
                             <th>Durasi (Menit)</th>
                             <th>Tempat</th>
+                            <th>Harga (IDR)</th>
                             <th>Action</th>
                         </tr>
                         </thead>
@@ -41,6 +61,7 @@
                             <td>{{ concert.tanggal }}</td>
                             <td>{{ concert.duration }}</td>
                             <td>{{ concert.tempat }}</td>
+                            <td>{{ concert.price }}</td>
                             <td>
                                 <a href="#" class="mr-2" @click="viewConcert(concert.id)">
                                     <i class="fas fa-eye" style="color : red !important;"></i>
@@ -56,9 +77,6 @@
 
                         </tbody>
                     </table>
-                </div>
-                <div class="card-footer">
-                    <pagination :data="concerts" @pagination-change-page="getAllConcerts"></pagination>
                 </div>
                 <!-- /.card-body -->
             </div>
@@ -98,7 +116,7 @@
                             <div class="form-group">
                                 <select class="form-control" id="choose_major" name="idol_id" v-model="form.idol_id">
                                     <option value="" disabled selected>Pilih Kategori</option>
-                                    <option v-for="category in categories.data" v-bind:value="category.id">{{ category.nama_idol }}</option>
+                                    <option v-for="category in categories" v-bind:value="category.id">{{ category.nama_idol }}</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -137,10 +155,10 @@
 
         <!-- Modal View -->
         <div class="modal fade" id="viewData" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-dialog modal-xl modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">View Kategori</h5>
+                        <h5 class="modal-title">View Konser</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true" style="color : red">&times;</span>
                         </button>
@@ -156,7 +174,7 @@
                                         <th scope="col">Tempat</th>
                                         <th scope="col">Tanggal</th>
                                         <th scope="col">Seat</th>
-                                        <th scope="col">Durasi</th>
+                                        <th scope="col">Durasi (Menit)</th>
                                         <th scope="col">Kategori</th>
                                         <th scope="col">Harga (IDR)</th>
                                     </tr>
@@ -177,7 +195,7 @@
                         </div>
                             <div class="row" v-show="loading == false">
                                 <div class="col-12">
-                                    <img class="img-thumbnail w-100" :src="'/images/concerts/'+concert.gambar">
+                                    <img class="img-thumbnail" :src="'/images/concerts/'+concert.gambar" style="width:400px"> <a :href="'/concerts/image/download/'+concert.id"><i class="fas fa-download"></i></a>
                                 </div>
                             </div>
 
@@ -214,7 +232,27 @@ export default {
                 duration : '',
                 price : '',
             }),
+            prices_list : [
+                [1000000, 1500000],
+                [1500000, 2000000],
+                [2000000, 2500000],
+                [2500000, 3000000],
+                [3000000, 7000000],
+            ],
+            selected: {
+                idol_id : 'all',
+                tanggal: 'all',
+                price_ranges : [],
+            },
             imagePreview: '/images/image_placeholder.png',
+        }
+    },
+    watch: {
+        selected: {
+            handler: function () {
+                this.getAllConcerts();
+            },
+            deep: true
         }
     },
     methods: {
@@ -324,13 +362,12 @@ export default {
                     )
                 });
         },
-        getAllConcerts(page) {
-            let uri = '/concerts?page=' + page;
-            axios.get(uri).then(response => {
-                return response.data;
-            }).then(data => {
-                this.concerts = data;
-            });
+        getAllConcerts() {
+            axios.get('/concerts', {
+                params : this.selected
+            }).then(response => {
+                this.concerts = response;
+            })
         },
         deleteConcert(id) {
             swal.fire({

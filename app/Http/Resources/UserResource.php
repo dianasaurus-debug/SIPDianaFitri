@@ -22,6 +22,7 @@ class UserResource extends JsonResource
             'role' => $this->role->nama,
             'role_id' => $this->role_id,
             'nomor_hp' => $this->nomor_hp,
+            'created_at' => $this->created_at->toFormattedDateString()
         ];
     }
 }

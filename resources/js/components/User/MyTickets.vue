@@ -54,6 +54,7 @@ export default {
             this.loading = true;
             axios.get('/mytickets').then( tickets => {
                 this.tickets = tickets.data;
+                console.log(tickets);
                 this.failed = false;
             }). catch((error) => {
                 this.failed = true;

@@ -2,21 +2,29 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\UsersExport;
 use App\Http\Resources\UserResource;
+use App\Imports\UsersImport;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class UserManagementController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+//    /**
+//     * Display a listing of the resource.
+//     *
+//     * @return \Illuminate\Http\Response
+//     */
     public function index()
     {
-        $users = User::all();
-        return UserResource::collection($users)->paginate(10)->toJson();
+//        $users = User::all();
+        $users = User::withFilters(
+            request()->input('role'),
+            request()->input('created_at'),
+        )->get();
+//        return UserResource::collection($users)->paginate(10)->toJson();
+        return UserResource::collection($users)->toJson();
     }
 
     /**
@@ -59,7 +67,11 @@ class UserManagementController extends Controller
      */
     public function show($id)
     {
-        //
+        $user = User::findOrFail($id);
+        UserResource::withoutWrapping();
+
+        return new UserResource($user);
+
     }
 
     /**
@@ -92,9 +104,32 @@ class UserManagementController extends Controller
     public function destroy($id)
     {
         $user = User::findOrFail($id);
-
         $user->delete();
-
         return ['Message' => 'User has successfully deleted!'];
+    }
+
+    public function exportExcel(Request $request)
+    {
+        return Excel::download(new UsersExport($request->role, $request->created_at), 'users.xlsx');
+    }
+    public function importExcel(Request $request)
+    {
+        $request->validate([
+            'import_file' => 'required|file|mimes:xls,xlsx'
+        ]);
+
+        $path = $request->file('import_file');
+        $data = Excel::import(new UsersImport, $path);
+
+        return response()->json(['message' => 'uploaded successfully'], 200);
+    }
+    public function multipleDestroy($id)
+    {
+        $single_user_id = explode(',' , $id);
+        $ids = [];
+        foreach($single_user_id as $id) {
+            User::findOrFail($id)->delete();
+        }
+
     }
 }

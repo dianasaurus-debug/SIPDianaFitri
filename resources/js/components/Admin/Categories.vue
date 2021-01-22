@@ -10,6 +10,14 @@
                         <button type="button" class="btn btn-danger" v-show="deleteItems.length > 0" @click="deleteMultipleCategories">
                             Delete Selected
                         </button>
+                        <select v-model="selected.created_at">
+                            <option value="all">All Dates</option>
+                            <option value="7d">Last 7 days</option>
+                            <option value="2d">Today</option>
+                            <option value="yd">Yesterday</option>
+                        </select>
+                        <a :href="'/categories/export/excel?created_at='+this.selected.created_at"
+                           class="btn btn-primary">Export Excel</a>
                         <button type="button" class="btn btn-success" @click="newModal">
                             Tambah <i class="fas fa-user-plus"></i>
                         </button>
@@ -17,7 +25,8 @@
                 </div>
                 <!-- /.card-header -->
                 <div class="card-body table-responsive p-0">
-                    <table class="table table-hover text-nowrap">
+                    <h5 v-show="Object.keys(categories).length==0" class="text-center mt-2">Belum ada data</h5>
+                    <table class="table table-hover text-nowrap" v-show="categories.length > 0">
                         <thead>
                         <tr>
                             <th>
@@ -34,13 +43,13 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr v-for="category in categories.data" :key="category.id">
+                        <tr v-for="category in categories" :key="category.id">
                             <td><input type="checkbox" v-model="deleteItems" :value="`${category.id}`"></td>
                             <td>{{ category.nama_idol }}</td>
                             <td>{{ category.desc && category.desc.length > 8 ? category.desc.substring(0,50)+".." : category.desc  }}
                             </td>
                             <td>
-                                <img :src="'/images/idols/'+category.foto" style="width: 70px;"/>
+                                <img :src="'/images/idols/'+category.foto" style="width: 70px;"/> <a :href="'/idols/image/download/'+category.id"><i class="fas fa-download"></i></a>
                             </td>
                             <td>
                                 <a href="#" class="mr-2" @click="viewIdol(category.id)">
@@ -57,9 +66,6 @@
 
                         </tbody>
                     </table>
-                </div>
-                <div class="card-footer">
-                    <pagination :data="categories" @pagination-change-page="getAllIdols"></pagination>
                 </div>
                 <!-- /.card-body -->
             </div>
@@ -124,7 +130,7 @@
                                         <p class="text-align-justify">{{category.desc}}</p>
                                     </div>
                                     <div class="col-4">
-                                        <img class="img-thumbnail w-100" :src="'/images/idols/'+category.foto">
+                                        <img class="img-thumbnail w-100" :src="'/images/idols/'+category.foto"> <a :href="'/idols/image/download/'+category.id"><i class="fas fa-download"></i></a>
                                     </div>
                             </div>
                     </div>
@@ -154,7 +160,18 @@ export default {
                 desc: '',
                 foto: '',
             }),
+            selected: {
+                created_at: 'all',
+            },
             imagePreview: '/images/image_placeholder.png',
+        }
+    },
+    watch: {
+        selected: {
+            handler: function () {
+                this.getAllIdols();
+            },
+            deep: true
         }
     },
     methods: {
@@ -214,12 +231,11 @@ export default {
                     )
                 });
         },
-        getAllIdols(page) {
-            let uri = '/idols?page=' + page;
-            axios.get(uri).then(response => {
-                return response.data;
-            }).then(data => {
-                this.categories = data;
+        getAllIdols() {
+            axios.get('/idols', {
+                params : this.selected
+            }).then(response => {
+                this.categories = response.data;
             });
         },
         deleteIdol(id) {

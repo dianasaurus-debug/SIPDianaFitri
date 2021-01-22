@@ -28,6 +28,7 @@ Route::group(['middleware' => ['web', 'auth', 'roles']], function () {
         Route::get('/concerts/all','App\Http\Controllers\ConcertController@index');
         Route::get('/concerts/view/{id}','App\Http\Controllers\ConcertController@show');
         Route::get('/concerts/all/{id}','App\Http\Controllers\ConcertController@concertById');
+        Route::get('/idols/all/','App\Http\Controllers\IdolController@index');
         Route::resource('ticket', App\Http\Controllers\TicketController::class);
         Route::get('/mytickets', 'App\Http\Controllers\TicketController@myTicket');
         Route::get('/mytickets/invoice', 'App\Http\Controllers\TicketController@exportTicket');
@@ -39,8 +40,14 @@ Route::group(['middleware' => ['web', 'auth', 'roles']], function () {
         Route::resource('roles', App\Http\Controllers\RoleController::class);
         Route::resource('idols', App\Http\Controllers\IdolController::class);
         Route::resource('concerts', App\Http\Controllers\ConcertController::class);
+        Route::get('/concerts/image/download/{id}', 'App\Http\Controllers\ConcertController@downloadImage');
+        Route::get('/idols/image/download/{id}', 'App\Http\Controllers\IdolController@downloadImage');
         Route::post('/idols/multiple-delete/{id}','App\Http\Controllers\IdolController@multipleDestroy');
         Route::post('/concerts/multiple-delete/{id}','App\Http\Controllers\ConcertController@multipleDestroy');
-
+        Route::post('/users/multiple-delete/{id}','App\Http\Controllers\UserManagementController@multipleDestroy');
+        Route::get('/export/excel', 'App\Http\Controllers\UserManagementController@exportExcel');
+        Route::get('/categories/export/excel', 'App\Http\Controllers\IdolController@exportExcel');
+        Route::get('/concerts/export/excel', 'App\Http\Controllers\ConcertController@exportExcel');
+        Route::post('/import/excel', 'App\Http\Controllers\UserManagementController@importExcel');
     });
 });
